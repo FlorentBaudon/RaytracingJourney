@@ -8,50 +8,10 @@
 #include "HittableList.h"
 #include <iostream>
 
-//double hit_sphere(const point3& center, double radius, const Ray& r)
-//{
-//	vec3 oc = r.origin - center;
-//
-//	//double a = dot(r.direction, r.direction);
-//	//double b = 2.0 * dot(oc, r.direction);
-//	//double c = dot(oc, oc) - radius * radius;
-//	//Optimized/Simplified version
-//	double a = r.direction.length_squared();
-//	double half_b = dot(oc, r.direction);
-//	double c = oc.length_squared() - radius * radius;
-//
-//	double discriminant = half_b * half_b - a * c;
-//
-//	if (discriminant > 0)
-//	{
-//		return  (-half_b - sqrt(discriminant) ) /  a ;
-//	}
-//	else 
-//	{
-//		return -1.0;
-//	}
-//
-//}
-
 color raycolor(const Ray& r, const HittableList& world)
 {
-//
-//	Sphere sphere(point3(0, 0, -1), 0.5);
-//	hit_record record;
-//	if(sphere.hit(r, 0, 1000, record))
-//	{
-//		return color(record.normal.x() + 1, record.normal.y() + 1, record.normal.z() + 1) / 2.0; // remap -1;1 to 0;1
-//	}
-//
-//	vec3 unit_direction = unit_vector(r.direction);
-//
-//	double t = 0.5 * (unit_direction.y() + 1.0);
-//
-//	color c = (1.0 - t) * color(1, 1, 1) + t * color(0.5, 0.7, 1.0);
-//
-//	return c;
 	hit_record record;
-	if (world.hit(r, 0, 10, record))
+	if (world.hit(r, 0, infinity, record))
 	{
 		return 0.5 * (record.normal + color(1, 1, 1));
 	}
@@ -73,7 +33,7 @@ int main(int argc, char* argv[])
 	//world 
 	HittableList world;
 	world.add( std::make_shared<Sphere>( point3( 0, 0, -1 ), 0.5 ) ) ;
-	world.add(std::make_shared<Sphere>( point3( 2, 0, -1 ), 2 ) );
+	world.add(std::make_shared<Sphere>( point3( 0, -100.5, -1 ), 100 ) );
 
 	// camera
 	double viewport_height = 2.0;

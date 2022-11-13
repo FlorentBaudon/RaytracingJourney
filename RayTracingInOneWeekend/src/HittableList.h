@@ -8,7 +8,7 @@
 class HittableList: public Hittable
 {
 public:
-	HittableList() = default;
+	HittableList() {};
 	HittableList(std::shared_ptr<Hittable> object) { add(object); }
 
 	void clear() { objects.clear(); }

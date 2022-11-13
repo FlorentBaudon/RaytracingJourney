@@ -9,12 +9,17 @@
 #include "Camera.h"
 #include <iostream>
 
-color raycolor(const Ray& r, const HittableList& world)
+color raycolor(const Ray& r, const HittableList& world, int bounce)
 {
+	if (bounce <= 0)
+		return color(0, 0, 0);
+
 	hit_record record;
+
 	if (world.hit(r, 0, infinity, record))
 	{
-		return 0.5 * (record.normal + color(1, 1, 1));
+		point3 target = record.p + record.normal + random_in_unit_sphere();
+		return 0.5 * raycolor(Ray(record.p, target - record.p), world, bounce - 1);
 	}
 
 	vec3 unit_direction = unit_vector(r.direction);
@@ -31,6 +36,7 @@ int main(int argc, char* argv[])
 	const int image_width = 400;
 	const int image_height = static_cast<int>(image_width / aspect_ratio);
 	const int samples_per_pixel = 10;
+	const int max_bounces = 10;
 
 	//world 
 	HittableList world;
@@ -57,7 +63,7 @@ int main(int argc, char* argv[])
 				double v = ( (double)j + random_double() ) / (image_height - 1);
 
 				Ray r = camera.GetRay(u, v);
-				pixel_color += raycolor(r, world);
+				pixel_color += raycolor(r, world, max_bounces);
 			}
 
 			write_color(std::cout, pixel_color, samples_per_pixel);

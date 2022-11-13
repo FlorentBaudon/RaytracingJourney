@@ -6,6 +6,7 @@
 #include "Ray.h"
 #include "Sphere.h"
 #include "HittableList.h"
+#include "Camera.h"
 #include <iostream>
 
 color raycolor(const Ray& r, const HittableList& world)
@@ -29,6 +30,7 @@ int main(int argc, char* argv[])
 	const double aspect_ratio = 16.0 / 9.0;
 	const int image_width = 400;
 	const int image_height = static_cast<int>(image_width / aspect_ratio);
+	const int samples_per_pixel = 10;
 
 	//world 
 	HittableList world;
@@ -36,15 +38,7 @@ int main(int argc, char* argv[])
 	world.add(std::make_shared<Sphere>( point3( 0, -100.5, -1 ), 100 ) );
 
 	// camera
-	double viewport_height = 2.0;
-	double viewport_width = aspect_ratio * viewport_height;
-	double focal_length = 1.0;
-
-	point3 camera_origin = point3(0, 0, 0);
-	vec3 horizontal = vec3(viewport_width, 0, 0);
-	vec3 vertical = vec3(0, viewport_height, 0);
-	point3 viewport_origin = camera_origin - horizontal/2 - vertical/2 - vec3(0, 0, focal_length); //bottom left corner
-
+	Camera camera;
 
 	std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
@@ -55,16 +49,18 @@ int main(int argc, char* argv[])
 		std::cerr << "\rScanline remaining : " << j << ' ' << std::flush;
 		for (int i = 0; i < image_width; i++)
 		{
-			double u = (double)i / (image_width - 1);
-			double v = (double)j / (image_height - 1);
-			
-			vec3 direction = viewport_origin + ( u * horizontal ) + ( v * vertical ) - camera_origin;
+			color pixel_color(0, 0, 0);
 
-			Ray r(camera_origin, direction);
-			
-			color pixel_color = raycolor(r, world);
+			for (int s = 0; s < samples_per_pixel; s++) 
+			{
+				double u = ( (double)i + random_double() ) / (image_width - 1);
+				double v = ( (double)j + random_double() ) / (image_height - 1);
 
-			write_color(std::cout, pixel_color);
+				Ray r = camera.GetRay(u, v);
+				pixel_color += raycolor(r, world);
+			}
+
+			write_color(std::cout, pixel_color, samples_per_pixel);
 		}
 	}
 

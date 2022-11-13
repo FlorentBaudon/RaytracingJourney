@@ -72,7 +72,7 @@
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>$(ProjectDir)Build\$(Configuration)\$(ProjectName).exe &gt; $(ProjectDir)Build\$(Configuration)\Test.ppm &amp; $(ProjectDir)Build\$(Configuration)\ppmviewer.exe $(ProjectDir)Build\$(Configuration)\Test.ppm</Command>
+      <Command>$(ProjectDir)Build\$(Configuration)\$(ProjectName).exe &gt; $(ProjectDir)Build\$(Configuration)\Test.ppm &amp; $(ProjectDir)ppmviewer.exe $(ProjectDir)Build\$(Configuration)\Test.ppm</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -93,7 +93,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PostBuildEvent>
-      <Command>$(ProjectDir)Build\$(Configuration)\$(ProjectName).exe &gt; $(ProjectDir)Build\$(Configuration)\Test.ppm &amp; $(ProjectDir)Build\$(Configuration)\ppmviewer.exe $(ProjectDir)Build\$(Configuration)\Test.ppm</Command>
+      <Command>$(ProjectDir)Build\$(Configuration)\$(ProjectName).exe &gt; $(ProjectDir)Build\$(Configuration)\Test.ppm &amp; $(ProjectDir)ppmviewer.exe $(ProjectDir)Build\$(Configuration)\Test.ppm</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

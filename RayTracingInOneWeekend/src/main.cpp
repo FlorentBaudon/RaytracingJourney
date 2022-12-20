@@ -7,6 +7,10 @@
 #include "Sphere.h"
 #include "HittableList.h"
 #include "Camera.h"
+
+namespace RL {
+	#include "raylib.h"
+}
 #include <iostream>
 
 color raycolor(const Ray& r, const HittableList& world, int bounce)
@@ -35,8 +39,10 @@ int main(int argc, char* argv[])
 	const double aspect_ratio = 16.0 / 9.0;
 	const int image_width = 400;
 	const int image_height = static_cast<int>(image_width / aspect_ratio);
-	const int samples_per_pixel = 10;
-	const int max_bounces = 10;
+	const int samples_per_pixel = 50;
+	const int max_bounces = 40;
+
+	RL::InitWindow(image_width, image_height, "Raytracing");
 
 	//world 
 	HittableList world;
@@ -46,28 +52,53 @@ int main(int argc, char* argv[])
 	// camera
 	Camera camera;
 
-	std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
+	vec3* colorbuffer = new vec3[image_width * image_height];
 
-	//std::cin.get();
-
-	for(int j = image_height-1; j>=0; --j)
+	for(int y = image_height-1; y>=0; --y)
 	{
-		std::cerr << "\rScanline remaining : " << j << ' ' << std::flush;
-		for (int i = 0; i < image_width; i++)
+		std::cout << "\rScanline remaining : " << y << ' ' << std::flush;
+		for (int x = 0; x < image_width; x++)
 		{
 			color pixel_color(0, 0, 0);
 
 			for (int s = 0; s < samples_per_pixel; s++) 
 			{
-				double u = ( (double)i + random_double() ) / (image_width - 1);
-				double v = ( (double)j + random_double() ) / (image_height - 1);
+				double u = ( (double)x + random_double() ) / (image_width - 1);
+				double v = ( (double)y + random_double() ) / (image_height - 1);
 
 				Ray r = camera.GetRay(u, v);
 				pixel_color += raycolor(r, world, max_bounces);
 			}
-
-			write_color(std::cout, pixel_color, samples_per_pixel);
+			colorbuffer[image_width * y + x] = vec3(
+				pixel_color.x(), // / (double)samples_per_pixel, 
+				pixel_color.y(), // / (double)samples_per_pixel, 
+				pixel_color.z() // / (double)samples_per_pixel
+			);
 		}
+	}
+
+	while (!RL::WindowShouldClose())
+	{
+		RL::BeginDrawing();
+
+		RL::ClearBackground(RL::RAYWHITE);
+
+		RL::DrawText("Congrats! You created your first window!", 190, 200, 20, RL::LIGHTGRAY);
+		for (int y = image_height - 1; y >= 0; --y)
+		{
+			for (int x = 0; x < image_width; x++)
+			{
+				vec3 c = create_color(colorbuffer[image_width * y + x], samples_per_pixel);
+				RL::Color col;
+				col.r = c.x();
+				col.g = c.y();
+				col.b = c.z();
+				col.a = 255;
+				RL::DrawPixel(x, image_height-y, col);
+			}
+		}
+
+		RL::EndDrawing();
 	}
 
 	std::cerr << "\Done\n";

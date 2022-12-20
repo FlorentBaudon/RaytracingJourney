@@ -20,7 +20,7 @@ color raycolor(const Ray& r, const HittableList& world, int bounce)
 
 	hit_record record;
 
-	if (world.hit(r, 0, infinity, record))
+	if (world.hit(r, 0.0001, infinity, record))
 	{
 		point3 target = record.p + record.normal + random_in_unit_sphere();
 		return 0.5 * raycolor(Ray(record.p, target - record.p), world, bounce - 1);
@@ -28,7 +28,7 @@ color raycolor(const Ray& r, const HittableList& world, int bounce)
 
 	vec3 unit_direction = unit_vector(r.direction);
 	double t = 0.5 * (unit_direction.y() + 1.0);
-	color c = (1.0 - t) * color(1, 1, 1) + t * color(0.5, 0.7, 1.0);
+	color c = (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.7, 1.0);
 
 	return c;
 }
@@ -39,8 +39,8 @@ int main(int argc, char* argv[])
 	const double aspect_ratio = 16.0 / 9.0;
 	const int image_width = 400;
 	const int image_height = static_cast<int>(image_width / aspect_ratio);
-	const int samples_per_pixel = 50;
-	const int max_bounces = 40;
+	const int samples_per_pixel = 100;
+	const int max_bounces = 50;
 
 	RL::InitWindow(image_width, image_height, "Raytracing");
 

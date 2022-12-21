@@ -31,6 +31,8 @@ int main(int argc, char* argv[])
 	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
 	InitWindow(1200, 1000 / aspect_ratio, "Raytracing");
 
+	bool bSamplesEdit = false, bBounceEdit = false;
+
 	while (!WindowShouldClose())
 	{
 		BeginDrawing();
@@ -41,6 +43,7 @@ int main(int argc, char* argv[])
 
 		image_width = GetScreenWidth() - viewportOffset;
 		image_height = GetScreenHeight();
+
 
 		GuiGroupBox(Rectangle{ 10, 10, 180, (float)GetScreenHeight() - 20}, "Render Settings");
 		if (GuiButton(Rectangle{ 20, 20, 160, 32 }, "Render"))
@@ -55,8 +58,12 @@ int main(int argc, char* argv[])
 
 			timeElapsed = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count() - lastTime;
 		}
+
+		if (GuiValueBox(Rectangle{ 70, 70, 60, 32 }, "Samples", &samples_per_pixel, 0, 500, bSamplesEdit))	bSamplesEdit = !bSamplesEdit;
+
+		if (GuiValueBox(Rectangle{ 70, 120, 60, 32 }, "Bounces", &max_bounces, 0, 500, bBounceEdit) )		bBounceEdit = !bBounceEdit;
+		
 		GuiDrawText(TextFormat("%i ms", timeElapsed), Rectangle{10, (float)GetScreenHeight() - 100, 180, 50}, TEXT_ALIGN_RIGHT, BLACK);
-		//std::cout << "Time : " << timeElapsed << std::endl;
 		
 	
 

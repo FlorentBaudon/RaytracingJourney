@@ -23,16 +23,21 @@ struct RenderSettings
 class Renderer
 {
 public :
+	Renderer() = default;
 	Renderer(RenderSettings settings);
 	void Render();
 	vec3* colorBuffer;
+	bool bRenderFinished = false;
 
 	color raycolor(const Ray& r, const HittableList& world, int bounce);
+	void SetRendererSettings(RenderSettings settings);
 private:
 	double aspect_ratio;
 	int image_width;
 	int image_height;
 	int samples_per_pixel;
 	int max_bounces;
+
+	std::vector<uint32_t> verticalIterator;
 };
 

@@ -5,6 +5,7 @@ workspace "RayTracingInOneWeekend"
 project "RayTracingInOneWeekend"
 	kind "ConsoleApp"
 	language "C++"
+	cppdialect "C++17"
 	targetdir "Build/%{cfg.buildcfg}"
 	objdir ("Intermediate/%{cfg.buildcfg}")
 	

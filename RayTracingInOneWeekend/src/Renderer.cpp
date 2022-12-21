@@ -1,4 +1,5 @@
 #include "Renderer.h"
+#include <execution>
 
 Renderer::Renderer(RenderSettings settings)
 {
@@ -11,12 +12,7 @@ Renderer::Renderer(RenderSettings settings)
 
 void Renderer::Render()
 {
-	// image
-	const double aspect_ratio = 16.0 / 9.0;
-	const int image_width = 400;
-	const int image_height = static_cast<int>(image_width / aspect_ratio);
-	const int samples_per_pixel = 20;
-	const int max_bounces = 4;
+	bRenderFinished = false;
 
 	//world 
 	HittableList world;
@@ -28,28 +24,63 @@ void Renderer::Render()
 
 	this->colorBuffer = new vec3[image_width * image_height];
 
+#define MT 1
+#if MT
+	for (uint32_t i = 0; i < image_height-1; i++)
+	{
+		verticalIterator.push_back(image_height - i -1);
+	}
+	
+	std::for_each(std::execution::par, verticalIterator.begin(), verticalIterator.end(), [this, &camera, &world](uint32_t y)
+		{
+			std::cout << "\rScanline remaining : " << y << ' ' << std::flush;
+			for (int x = 0; x < image_width - 1; x++)
+			{
+				color pixel_color(0, 0, 0);
+
+				for (int s = 0; s < samples_per_pixel; s++)
+				{
+					double u = ((double)x + random_double()) / (image_width - 1);
+					double v = ((double)y + random_double()) / (image_height - 1);
+
+					Ray r = camera.GetRay(u, v);
+					pixel_color += raycolor(r, world, max_bounces);
+				}
+
+				this->colorBuffer[image_width * y + x] = vec3(
+					pixel_color.x(), // / (double)samples_per_pixel, 
+					pixel_color.y(), // / (double)samples_per_pixel, 
+					pixel_color.z() // / (double)samples_per_pixel
+				);
+			}
+		});
+#else
 	for (int y = image_height - 1; y >= 0; --y)
 	{
-		std::cout << "\rScanline remaining : " << y << ' ' << std::flush;
-		for (int x = 0; x < image_width; x++)
-		{
-			color pixel_color(0, 0, 0);
-
-			for (int s = 0; s < samples_per_pixel; s++)
+			std::cout << "\rScanline remaining : " << y << ' ' << std::flush;
+			for (int x = 0; x < image_width - 1; x++)
 			{
-				double u = ((double)x + random_double()) / (image_width - 1);
-				double v = ((double)y + random_double()) / (image_height - 1);
+				color pixel_color(0, 0, 0);
 
-				Ray r = camera.GetRay(u, v);
-				pixel_color += raycolor(r, world, max_bounces);
+				for (int s = 0; s < samples_per_pixel; s++)
+				{
+					double u = ((double)x + random_double()) / (image_width - 1);
+					double v = ((double)y + random_double()) / (image_height - 1);
+
+					Ray r = camera.GetRay(u, v);
+					pixel_color += raycolor(r, world, max_bounces);
+				}
+
+				this->colorBuffer[image_width * y + x] = vec3(
+					pixel_color.x(), // / (double)samples_per_pixel, 
+					pixel_color.y(), // / (double)samples_per_pixel, 
+					pixel_color.z() // / (double)samples_per_pixel
+				);
 			}
-			this->colorBuffer[image_width * y + x] = vec3(
-				pixel_color.x(), // / (double)samples_per_pixel, 
-				pixel_color.y(), // / (double)samples_per_pixel, 
-				pixel_color.z() // / (double)samples_per_pixel
-			);
-		}
 	}
+#endif
+
+	bRenderFinished = true;
 }
 
 color Renderer::raycolor(const Ray& r, const HittableList& world, int bounce)
@@ -70,4 +101,13 @@ color Renderer::raycolor(const Ray& r, const HittableList& world, int bounce)
 	color c = (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.7, 1.0);
 
 	return c;
+}
+
+void Renderer::SetRendererSettings(RenderSettings settings)
+{
+	this->image_width = settings.image_width;
+	this->image_height = settings.image_height;
+	this->aspect_ratio = settings.aspect_ratio;
+	this->samples_per_pixel = settings.samples_per_pixel;
+	this->max_bounces = settings.max_bounces;
 }

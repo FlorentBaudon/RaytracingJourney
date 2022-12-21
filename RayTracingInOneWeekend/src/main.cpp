@@ -22,14 +22,14 @@ int main(int argc, char* argv[])
 	const double aspect_ratio = 16.0 / 9.0;
 	int image_width = 400;
 	int image_height = static_cast<int>(image_width / aspect_ratio);
-	int samples_per_pixel = 20;
-	int max_bounces = 4;
+	int samples_per_pixel = 100;
+	int max_bounces = 50;
 
 	uint64_t lastTime = 0;
 	uint64_t timeElapsed = 0;
 
 	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-	InitWindow(800, 450, "Raytracing");
+	InitWindow(1200, 1000 / aspect_ratio, "Raytracing");
 
 	while (!WindowShouldClose())
 	{
@@ -46,8 +46,8 @@ int main(int argc, char* argv[])
 		if (GuiButton(Rectangle{ 20, 20, 160, 32 }, "Render"))
 		{
 			using namespace std::chrono;
-			RenderSettings settings(400, 200, 16.0 / 9.0, 20, 4);
-			renderer->SetRendererSettings(RenderSettings(GetScreenWidth() - viewportOffset, GetScreenHeight(), 16.0 / 9.0, 20, 4));
+			RenderSettings settings(GetScreenWidth() - viewportOffset, GetScreenHeight(), aspect_ratio, samples_per_pixel, max_bounces);
+			renderer->SetRendererSettings(settings);
 
 			lastTime = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
 

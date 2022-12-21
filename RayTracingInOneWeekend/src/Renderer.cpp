@@ -24,7 +24,7 @@ void Renderer::Render()
 
 	this->colorBuffer = new vec3[image_width * image_height];
 
-#define MT 1
+#define MT 0
 #if MT
 	for (uint32_t i = 0; i < image_height-1; i++)
 	{
@@ -33,7 +33,7 @@ void Renderer::Render()
 	
 	std::for_each(std::execution::par, verticalIterator.begin(), verticalIterator.end(), [this, &camera, &world](uint32_t y)
 		{
-			std::cout << "\rScanline remaining : " << y << ' ' << std::flush;
+			//std::cout << "\rMT Scanline remaining : " << y << ' ' << std::flush;
 			for (int x = 0; x < image_width - 1; x++)
 			{
 				color pixel_color(0, 0, 0);

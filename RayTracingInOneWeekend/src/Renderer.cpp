@@ -10,6 +10,15 @@ Renderer::Renderer(RenderSettings settings)
 	this->max_bounces = settings.max_bounces;
 }
 
+void Renderer::StartRender()
+{
+	renderThread = std::thread(&Renderer::Render, this);
+}
+
+void Renderer::StopRender()
+{
+}
+
 void Renderer::Render()
 {
 	bRenderFinished = false;
@@ -57,7 +66,7 @@ void Renderer::Render()
 #else
 	for (int y = image_height - 1; y >= 0; --y)
 	{
-			std::cout << "\rScanline remaining : " << y << ' ' << std::flush;
+			//std::cout << "\rScanline remaining : " << y << ' ' << std::flush;
 			for (int x = 0; x < image_width - 1; x++)
 			{
 				color pixel_color(0, 0, 0);

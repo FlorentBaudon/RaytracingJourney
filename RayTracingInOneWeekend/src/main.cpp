@@ -13,6 +13,11 @@ namespace RL {
 #include <iostream>
 #include <chrono>
 
+void foo(int i)
+{
+	std::cout << i << std::endl;
+}
+
 int main(int argc, char* argv[])
 {
 	using namespace RL;
@@ -54,7 +59,7 @@ int main(int argc, char* argv[])
 
 			lastTime = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
 
-			renderer->Render();
+			renderer->StartRender();
 
 			timeElapsed = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count() - lastTime;
 		}

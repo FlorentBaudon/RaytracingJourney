@@ -6,6 +6,7 @@
 #include "Sphere.h"
 #include "HittableList.h"
 #include "Camera.h"
+#include <thread>
 
 struct RenderSettings
 {
@@ -25,13 +26,18 @@ class Renderer
 public :
 	Renderer() = default;
 	Renderer(RenderSettings settings);
-	void Render();
+	
+	// Members
 	vec3* colorBuffer;
 	bool bRenderFinished = false;
 
-	color raycolor(const Ray& r, const HittableList& world, int bounce);
+	//Functions
 	void SetRendererSettings(RenderSettings settings);
+	void StartRender();
+	void StopRender();
+
 private:
+	// Members
 	double aspect_ratio;
 	int image_width;
 	int image_height;
@@ -39,5 +45,11 @@ private:
 	int max_bounces;
 
 	std::vector<uint32_t> verticalIterator;
+
+	std::thread renderThread;
+
+	//Functions
+	void Render();
+	color raycolor(const Ray& r, const HittableList& world, int bounce);
 };
 

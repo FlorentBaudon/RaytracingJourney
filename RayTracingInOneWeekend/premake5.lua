@@ -26,11 +26,14 @@ project "RayTracingInOneWeekend"
 		"winmm.lib",
 		"raylib.lib"
 	}
-   filter "configurations:Debug"
+	
+	linkoptions { "/SUBSYSTEM:windows /ENTRY:mainCRTStartup" }
+	
+	filter "configurations:Debug"
       defines { "DEBUG" }
       symbols "On"
 
-   filter "configurations:Release"
+	filter "configurations:Release"
       defines { "NDEBUG" }
       optimize "On"
 	

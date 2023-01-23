@@ -1,4 +1,6 @@
 #include "Renderer.h"
+#include "Materials/M_Lambertian.h"
+#include "Materials/M_Metallic.h"
 #include <execution>
 
 Renderer::Renderer(RenderSettings settings)
@@ -25,8 +27,15 @@ void Renderer::Render()
 
 	//world 
 	HittableList world;
-	world.add(std::make_shared<Sphere>(point3(0, 0, -1), 0.5));
-	world.add(std::make_shared<Sphere>(point3(0, -100.5, -1), 100));
+	std::shared_ptr<Material> ground = std::make_shared<Lambertian>(point3(0.8, 0.8, 0));
+	std::shared_ptr<Material> sphereCenter = std::make_shared<Lambertian>(point3(0.7, 0.3, 0.3));
+	std::shared_ptr<Material> sphereLeft = std::make_shared<Metallic>(point3(0.8, 0.8, 0.8));
+	std::shared_ptr<Material> sphereRight = std::make_shared<Metallic>(point3(0.8, 0.6, 0.2));
+	
+	world.add(std::make_shared<Sphere>(point3(0, -100.5, -1), 100, ground));
+	world.add(std::make_shared<Sphere>(point3(0, 0, -1), 0.5, sphereCenter));
+	world.add(std::make_shared<Sphere>(point3(-1, 0, -1), 0.5, sphereLeft));
+	world.add(std::make_shared<Sphere>(point3(1, 0, -1), 0.5, sphereRight));
 
 	// camera
 	Camera camera;
@@ -101,8 +110,12 @@ color Renderer::raycolor(const Ray& r, const HittableList& world, int bounce)
 
 	if (world.hit(r, 0.0001, infinity, record))
 	{
-		point3 target = record.p + record.normal + random_in_unit_sphere();
-		return 0.5 * raycolor(Ray(record.p, target - record.p), world, bounce - 1);
+		Ray scattered;
+		color attenuation;
+		if( record.mat_ptr->Scatter(r, record, attenuation, scattered) )
+			return attenuation * raycolor(scattered, world, bounce - 1);
+
+		return color(0, 0, 0);
 	}
 
 	vec3 unit_direction = unit_vector(r.direction);

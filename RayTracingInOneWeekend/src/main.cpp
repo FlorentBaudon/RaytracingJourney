@@ -27,7 +27,8 @@ int main(int argc, char* argv[])
 	const double aspect_ratio = 16.0 / 9.0;
 	int image_width = 400;
 	int image_height = static_cast<int>(image_width / aspect_ratio);
-	int samples_per_pixel = 100;
+	int ui_samples_per_pixel = 100;
+	int samples_per_pixel = 0;
 	int max_bounces = 50;
 
 	uint64_t lastTime = 0;
@@ -54,6 +55,8 @@ int main(int argc, char* argv[])
 		if (GuiButton(Rectangle{ 20, 20, 160, 32 }, "Render"))
 		{
 			using namespace std::chrono;
+			samples_per_pixel = ui_samples_per_pixel;
+
 			RenderSettings settings(GetScreenWidth() - viewportOffset, GetScreenHeight(), aspect_ratio, samples_per_pixel, max_bounces);
 			renderer->SetRendererSettings(settings);
 
@@ -64,7 +67,7 @@ int main(int argc, char* argv[])
 			timeElapsed = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count() - lastTime;
 		}
 
-		if (GuiValueBox(Rectangle{ 70, 70, 60, 32 }, "Samples", &samples_per_pixel, 0, 500, bSamplesEdit))	bSamplesEdit = !bSamplesEdit;
+		if (GuiValueBox(Rectangle{ 70, 70, 60, 32 }, "Samples", &ui_samples_per_pixel, 0, 500, bSamplesEdit))	bSamplesEdit = !bSamplesEdit;
 
 		if (GuiValueBox(Rectangle{ 70, 120, 60, 32 }, "Bounces", &max_bounces, 0, 500, bBounceEdit) )		bBounceEdit = !bBounceEdit;
 		

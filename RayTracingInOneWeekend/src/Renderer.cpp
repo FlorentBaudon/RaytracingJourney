@@ -1,6 +1,7 @@
 #include "Renderer.h"
 #include "Materials/M_Lambertian.h"
 #include "Materials/M_Metallic.h"
+
 #include <execution>
 
 Renderer::Renderer(RenderSettings settings)
@@ -29,8 +30,8 @@ void Renderer::Render()
 	HittableList world;
 	std::shared_ptr<Material> ground = std::make_shared<Lambertian>(point3(0.8, 0.8, 0));
 	std::shared_ptr<Material> sphereCenter = std::make_shared<Lambertian>(point3(0.7, 0.3, 0.3));
-	std::shared_ptr<Material> sphereLeft = std::make_shared<Metallic>(point3(0.8, 0.8, 0.8));
-	std::shared_ptr<Material> sphereRight = std::make_shared<Metallic>(point3(0.8, 0.6, 0.2));
+	std::shared_ptr<Material> sphereLeft = std::make_shared<Metallic>(point3(0.8, 0.8, 0.8), 0.3f);
+	std::shared_ptr<Material> sphereRight = std::make_shared<Metallic>(point3(0.8, 0.6, 0.2), 1.0f);
 	
 	world.add(std::make_shared<Sphere>(point3(0, -100.5, -1), 100, ground));
 	world.add(std::make_shared<Sphere>(point3(0, 0, -1), 0.5, sphereCenter));

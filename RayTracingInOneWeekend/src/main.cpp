@@ -27,9 +27,9 @@ int main(int argc, char* argv[])
 	const double aspect_ratio = 16.0 / 9.0;
 	int image_width = 400;
 	int image_height = static_cast<int>(image_width / aspect_ratio);
-	int ui_samples_per_pixel = 100;
+	int ui_samples_per_pixel = 50;
 	int samples_per_pixel = 0;
-	int max_bounces = 50;
+	int max_bounces = 10;
 
 	uint64_t lastTime = 0;
 	uint64_t timeElapsed = 0;

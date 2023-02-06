@@ -53,5 +53,7 @@ private:
 	//Functions
 	void Render();
 	color raycolor(const Ray& r, const HittableList& world, int bounce);
+
+	void random_scene(HittableList& world);
 };
 

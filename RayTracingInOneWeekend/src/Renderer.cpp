@@ -38,22 +38,25 @@ void Renderer::Render()
 
 	//world 
 	HittableList world;
-	std::shared_ptr<Material> ground = std::make_shared<Lambertian>(point3(0.8, 0.8, 0));
-	std::shared_ptr<Material> sphereCenter = std::make_shared<Lambertian>(point3(0.7, 0.3, 0.3));
-	std::shared_ptr<Material> sphereLeft = std::make_shared<Dielectric>(1.5);
-	std::shared_ptr<Material> sphereRight = std::make_shared<Metallic>(color(0.8, 0.8, 0.8), 1.0f);
+	std::shared_ptr<Material> ground = std::make_shared<Lambertian>(color(0.5, 0.5, 0.5));
+	std::shared_ptr<Material> diffuse = std::make_shared<Lambertian>(color(0.4, 0.2, 0.1));
+	std::shared_ptr<Material> glass = std::make_shared<Dielectric>(1.5);
+	std::shared_ptr<Material> metal = std::make_shared<Metallic>(color(0.7, 0.6, 0.5), 0.0f);
 	
-	world.add(std::make_shared<Sphere>(point3(0, -100.5, -1), 100, ground));
-	world.add(std::make_shared<Sphere>(point3(0, 0, -1), 0.5, sphereCenter));
-	world.add(std::make_shared<Sphere>(point3(-1, 0, -1), 0.5, sphereLeft));
-	world.add(std::make_shared<Sphere>(point3(1, 0, -1), 0.5, sphereRight));
+	world.add(std::make_shared<Sphere>(point3(0, -1000, 0), 1000, ground));
+	world.add(std::make_shared<Sphere>(point3(0, 1, 0), 1, glass));
+	world.add(std::make_shared<Sphere>(point3(-4, 1, 0), 1, diffuse));
+	world.add(std::make_shared<Sphere>(point3(4, 1, 0), 1, metal));
+
+
+	random_scene(world);
 
 	// camera
-	point3 cPosition = point3(-2, 2, 1);
-	point3 lookat = point3(0, 0, -1);
+	point3 cPosition = point3(13,2,3);
+	point3 lookat = point3(0, 0, 0);
 	vec3 vup = vec3(0, 1, 0);
-	double distFocus = (lookat - cPosition).length();
-	double aperture = 2.0;
+	double distFocus = 10;//(lookat - cPosition).length();
+	double aperture = 0.1;
 
 	Camera camera(cPosition, lookat, vup, 20, 16.0/9.0, aperture, distFocus);
 
@@ -165,4 +168,37 @@ void Renderer::SetRendererSettings(RenderSettings settings)
 	this->aspect_ratio = settings.aspect_ratio;
 	this->samples_per_pixel = settings.samples_per_pixel;
 	this->max_bounces = settings.max_bounces;
+}
+
+void Renderer::random_scene(HittableList& world)
+{
+	for (int a = -11; a < 11; a++) {
+		for (int b = -11; b < 11; b++) {
+			auto choose_mat = random_double();
+			point3 center(a + 0.9 * random_double(), 0.2, b + 0.9 * random_double());
+
+			if ((center - point3(4, 0.2, 0)).length() > 0.9) {
+				std::shared_ptr<Material> sphere_material;
+
+				if (choose_mat < 0.8) {
+					// diffuse
+					auto albedo = random() * random();
+					sphere_material = std::make_shared<Lambertian>(albedo);
+					world.add(std::make_shared<Sphere>(center, 0.2, sphere_material));
+				}
+				else if (choose_mat < 0.95) {
+					// metal
+					auto albedo = random(0.5, 1);
+					auto fuzz = random_double(0, 0.5);
+					sphere_material = std::make_shared<Metallic>(albedo, fuzz);
+					world.add(std::make_shared<Sphere>(center, 0.2, sphere_material));
+				}
+				else {
+					// glass
+					sphere_material = std::make_shared<Dielectric>(1.5);
+					world.add(std::make_shared<Sphere>(center, 0.2, sphere_material));
+				}
+			}
+		}
+	}
 }

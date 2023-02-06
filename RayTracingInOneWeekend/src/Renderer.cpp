@@ -3,7 +3,7 @@
 
 #include <execution>
 
-#define MT 1
+#define MT 0
 
 Renderer::Renderer(RenderSettings settings)
 {
@@ -40,7 +40,7 @@ void Renderer::Render()
 	HittableList world;
 	std::shared_ptr<Material> ground = std::make_shared<Lambertian>(point3(0.8, 0.8, 0));
 	std::shared_ptr<Material> sphereCenter = std::make_shared<Lambertian>(point3(0.7, 0.3, 0.3));
-	std::shared_ptr<Material> sphereLeft = std::make_shared<Dielectric>(1.4);
+	std::shared_ptr<Material> sphereLeft = std::make_shared<Dielectric>(1.5);
 	std::shared_ptr<Material> sphereRight = std::make_shared<Metallic>(color(0.8, 0.8, 0.8), 1.0f);
 	
 	world.add(std::make_shared<Sphere>(point3(0, -100.5, -1), 100, ground));
@@ -49,7 +49,13 @@ void Renderer::Render()
 	world.add(std::make_shared<Sphere>(point3(1, 0, -1), 0.5, sphereRight));
 
 	// camera
-	Camera camera;
+	point3 cPosition = point3(-2, 2, 1);
+	point3 lookat = point3(0, 0, -1);
+	vec3 vup = vec3(0, 1, 0);
+	double distFocus = (lookat - cPosition).length();
+	double aperture = 2.0;
+
+	Camera camera(cPosition, lookat, vup, 20, 16.0/9.0, aperture, distFocus);
 
 	this->colorBuffer = new vec3[image_width * image_height];
 

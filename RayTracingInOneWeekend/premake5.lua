@@ -27,8 +27,6 @@ project "RayTracingInOneWeekend"
 		"raylib.lib"
 	}
 	
-	linkoptions { "/SUBSYSTEM:windows /ENTRY:mainCRTStartup" }
-	
 	filter "configurations:Debug"
       defines { "DEBUG" }
       symbols "On"
@@ -36,4 +34,5 @@ project "RayTracingInOneWeekend"
 	filter "configurations:Release"
       defines { "NDEBUG" }
       optimize "On"
+	  linkoptions { "/SUBSYSTEM:windows /ENTRY:mainCRTStartup" }
 	

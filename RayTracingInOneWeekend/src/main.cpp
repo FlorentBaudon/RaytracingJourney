@@ -67,9 +67,14 @@ int main(int argc, char* argv[])
 			timeElapsed = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count() - lastTime;
 		}
 
-		if (GuiValueBox(Rectangle{ 70, 70, 60, 32 }, "Samples", &ui_samples_per_pixel, 0, 500, bSamplesEdit))	bSamplesEdit = !bSamplesEdit;
+		if (GuiButton(Rectangle{ 20, 60, 160, 32 }, "Stop Render"))
+		{
+			renderer->StopRender();
+		}
 
-		if (GuiValueBox(Rectangle{ 70, 120, 60, 32 }, "Bounces", &max_bounces, 0, 500, bBounceEdit) )		bBounceEdit = !bBounceEdit;
+		if (GuiValueBox(Rectangle{ 70, 120, 60, 32 }, "Samples", &ui_samples_per_pixel, 0, 500, bSamplesEdit))	bSamplesEdit = !bSamplesEdit;
+
+		if (GuiValueBox(Rectangle{ 70, 160, 60, 32 }, "Bounces", &max_bounces, 0, 500, bBounceEdit) )		bBounceEdit = !bBounceEdit;
 		
 		GuiDrawText(TextFormat("%i ms", timeElapsed), Rectangle{10, (float)GetScreenHeight() - 100, 180, 50}, TEXT_ALIGN_RIGHT, BLACK);
 		

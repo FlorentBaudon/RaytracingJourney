@@ -3,6 +3,8 @@
 
 #include <execution>
 
+#define MT 1
+
 Renderer::Renderer(RenderSettings settings)
 {
 	this->image_width = settings.image_width;
@@ -14,11 +16,20 @@ Renderer::Renderer(RenderSettings settings)
 
 void Renderer::StartRender()
 {
-	renderThread = std::thread(&Renderer::Render, this);
+	std::cout << "Start Render" << std::endl;
+	StopRender();
+	renderThread = std::thread{&Renderer::Render, this};
 }
 
 void Renderer::StopRender()
 {
+	if (!bRenderFinished || renderThread.joinable())
+	{
+		std::cout << "Push stop" << std::endl;
+		bRenderStopped = true;
+		renderThread.join();
+		bRenderStopped = false;
+	}
 }
 
 void Renderer::Render()
@@ -42,18 +53,25 @@ void Renderer::Render()
 
 	this->colorBuffer = new vec3[image_width * image_height];
 
-#define MT 0
 #if MT
 	for (uint32_t i = 0; i < image_height-1; i++)
 	{
 		verticalIterator.push_back(image_height - i -1);
 	}
-	
+
 	std::for_each(std::execution::par, verticalIterator.begin(), verticalIterator.end(), [this, &camera, &world](uint32_t y)
 		{
 			//std::cout << "\rMT Scanline remaining : " << y << ' ' << std::flush;
 			for (int x = 0; x < image_width - 1; x++)
 			{
+				/* Stop threading*/
+				if (bRenderStopped == true)
+				{
+					bRenderFinished = true;
+					return;
+				}
+				/*****************/
+
 				color pixel_color(0, 0, 0);
 
 				for (int s = 0; s < samples_per_pixel; s++)
@@ -75,30 +93,39 @@ void Renderer::Render()
 #else
 	for (int y = image_height - 1; y >= 0; --y)
 	{
-			//std::cout << "\rScanline remaining : " << y << ' ' << std::flush;
-			for (int x = 0; x < image_width - 1; x++)
+		//std::cout << "\rScanline remaining : " << y << ' ' << std::flush;
+		for (int x = 0; x < image_width - 1; x++)
+		{
+			/* Stop threading*/
+			if (bRenderStopped == true)
 			{
-				color pixel_color(0, 0, 0);
-
-				for (int s = 0; s < samples_per_pixel; s++)
-				{
-					double u = ((double)x + random_double()) / (image_width - 1);
-					double v = ((double)y + random_double()) / (image_height - 1);
-
-					Ray r = camera.GetRay(u, v);
-					pixel_color += raycolor(r, world, max_bounces);
-				}
-
-				this->colorBuffer[image_width * y + x] = vec3(
-					pixel_color.x(), // / (double)samples_per_pixel, 
-					pixel_color.y(), // / (double)samples_per_pixel, 
-					pixel_color.z() // / (double)samples_per_pixel
-				);
+				bRenderFinished = true;
+				return;
 			}
+			/*****************/
+
+			color pixel_color(0, 0, 0);
+
+			for (int s = 0; s < samples_per_pixel; s++)
+			{
+				double u = ((double)x + random_double()) / (image_width - 1);
+				double v = ((double)y + random_double()) / (image_height - 1);
+
+				Ray r = camera.GetRay(u, v);
+				pixel_color += raycolor(r, world, max_bounces);
+			}
+
+			this->colorBuffer[image_width * y + x] = vec3(
+				pixel_color.x(), // / (double)samples_per_pixel, 
+				pixel_color.y(), // / (double)samples_per_pixel, 
+				pixel_color.z() // / (double)samples_per_pixel
+			);
+		}
 	}
+
 #endif
 
-	bRenderFinished = true;
+	bRenderFinished = true;	
 }
 
 color Renderer::raycolor(const Ray& r, const HittableList& world, int bounce)

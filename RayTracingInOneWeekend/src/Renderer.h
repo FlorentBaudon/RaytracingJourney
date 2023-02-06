@@ -29,12 +29,15 @@ public :
 	
 	// Members
 	vec3* colorBuffer;
-	bool bRenderFinished = false;
+	bool bRenderFinished = true;
+	bool bRenderStopped = false;
 
 	//Functions
 	void SetRendererSettings(RenderSettings settings);
 	void StartRender();
 	void StopRender();
+
+	
 
 private:
 	// Members
@@ -44,9 +47,8 @@ private:
 	int samples_per_pixel;
 	int max_bounces;
 
-	std::vector<uint32_t> verticalIterator;
-
 	std::thread renderThread;
+	std::vector<uint32_t> verticalIterator;
 
 	//Functions
 	void Render();

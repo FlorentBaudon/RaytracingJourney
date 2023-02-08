@@ -32,7 +32,7 @@ project "RayTracingInOneWeekend"
       symbols "On"
 
 	filter "configurations:Release"
+	  linkoptions { "/SUBSYSTEM:windows /ENTRY:mainCRTStartup" }
       defines { "NDEBUG" }
       optimize "On"
-	  linkoptions { "/SUBSYSTEM:windows /ENTRY:mainCRTStartup" }
 	

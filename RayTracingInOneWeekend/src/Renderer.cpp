@@ -3,7 +3,7 @@
 
 #include <execution>
 
-#define MT 0
+#define MT 1
 
 Renderer::Renderer(RenderSettings settings)
 {
@@ -39,13 +39,13 @@ void Renderer::Render()
 	//world 
 	HittableList world;
 	std::shared_ptr<Material> ground = std::make_shared<Lambertian>(color(0.5, 0.5, 0.5));
-	std::shared_ptr<Material> diffuse = std::make_shared<Lambertian>(color(0.4, 0.2, 0.1));
+	std::shared_ptr<Material> diffuse = std::make_shared<Lambertian>(color(1.0, 0.0, 0.0));
 	std::shared_ptr<Material> glass = std::make_shared<Dielectric>(1.5);
 	std::shared_ptr<Material> metal = std::make_shared<Metallic>(color(0.7, 0.6, 0.5), 0.0f);
 	
 	world.add(std::make_shared<Sphere>(point3(0, -1000, 0), 1000, ground));
-	world.add(std::make_shared<Sphere>(point3(0, 1, 0), 1, glass));
-	world.add(std::make_shared<Sphere>(point3(-4, 1, 0), 1, diffuse));
+	world.add(std::make_shared<Sphere>(point3(-2, 1, 2.5), 1, diffuse));
+	world.add(std::make_shared<Sphere>(point3(0, 1, 1), 1, glass));
 	world.add(std::make_shared<Sphere>(point3(4, 1, 0), 1, metal));
 
 
@@ -172,8 +172,8 @@ void Renderer::SetRendererSettings(RenderSettings settings)
 
 void Renderer::random_scene(HittableList& world)
 {
-	for (int a = -11; a < 11; a++) {
-		for (int b = -11; b < 11; b++) {
+	for (float a = -11; a < 11; a=a+1.5f) {
+		for (float b = -11; b < 11; b=b+1.5f) {
 			auto choose_mat = random_double();
 			point3 center(a + 0.9 * random_double(), 0.2, b + 0.9 * random_double());
 
